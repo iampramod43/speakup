@@ -1,112 +1,346 @@
-import Image from "next/image";
+"use client";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useSession } from "next-auth/react";
+
+const formSchema = z.object({
+  orgId: z.string().min(4, {
+    message: "Orgnanization ID is required",
+  }),
+  issueId: z.string().min(4, {
+    message: "",
+  }),
+  issueTitle: z.string().min(10, {
+    message: "Issue title must be at least 10 characters.",
+  }),
+  description: z.string().min(20, {
+    message: "Description must be at least 20 characters.",
+  }),
+  category: z.string().nonempty({
+    message: "Category is required.",
+  }),
+  file: z.instanceof(FileList).optional(),
+});
 
 export default function Home() {
+  const [loading, setLoading] = useState(false);
+  const [issueId, setIssueId] = useState('');
+  const { data: session, status } = useSession();
+  const [issueDetails, setIssueDetails] = useState<any | null>(null);
+  const [error, setError] = useState("");
+  const generateUniqueString = () => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = 'sp';
+    for (let i = 0; i < 4; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters[randomIndex];
+    }
+    return result;
+};
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      orgId: "",
+      issueTitle: "",
+      issueId: generateUniqueString(),
+      description: "",
+      category: "",
+    },
+  });
+
+  const fileRef = form.register("file");
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    const formData = new FormData();
+    formData.append('oid', data.orgId);
+    formData.append('issue_title', data.issueTitle);
+    formData.append('issue_description', data.description);
+    formData.append('category', data.category);
+    formData.append('issueId', data.issueId);
+    if (data.file && data.file.length > 0) {
+      for (let i = 0; i < data.file.length; i++) {
+        formData.append('attachments', data.file[i]);
+      }
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:4001/issues/create', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
+
+      const result = await response.json();
+      console.log('Form submitted successfully', result);
+    } catch (error) {
+      console.error('Error submitting form', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleFetchIssue = async () => {
+    // Construct the API URL with optional orgId query parameter
+    let apiUrl = process.env.NEXT_PUBLIC_BASE_URL + 'issues/get';
+    apiUrl += `?issueId=${issueId}`;
+    console.log("🚀 ~ file: page.tsx:216 ~ fetchIssues ~ session:", session);
+    
+
+    try {
+      // Make an API call to fetch issues
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error('Failed to fetch issues');
+      }
+  
+      const data = await response.json();
+      setIssueDetails(data[0]);
+      setError("");
+    } catch (error) {
+      setIssueDetails(null);
+      setError("Issue not found");
+    }
+  };
+
+  const { control, handleSubmit, register, watch } = form;
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+    <main className="p-[40px]">
+      <div className="mainTitle h-[100px] flex items-center justify-center text-[40px] font-bold text-[#242424] dark:text-[#fafafa]">
+        What is your Issue?
+      </div>
+      <div className="mainBody flex w-full h-full flex-col items-center justify-center p-10 gap-[12px]">
+      <div className="issueExists w-[650px] flex justify-end">
+      <Dialog>
+      <DialogTrigger asChild>
+        <p className="text-[#0a8537] cursor-pointer">Already have an issue Id? View issue now.</p>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>View Issue Details</DialogTitle>
+          <DialogDescription>
+            Enter the Issue ID to view the details of the issue.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex items-center space-x-2">
+          <div className="grid flex-1 gap-2">
+            <Label htmlFor="issueId" className="sr-only">
+              Issue ID
+            </Label>
+            <Input
+              id="issueId"
+              value={issueId}
+              onChange={(e) => setIssueId(e.target.value)}
+              placeholder="Enter Issue ID"
             />
-          </a>
+          </div>
+          <Button onClick={handleFetchIssue} size="sm" className="px-3">
+            Fetch
+          </Button>
         </div>
+        {error && <p className="text-red-500 mt-4">{error}</p>}
+        {issueDetails && (
+          <div className="mt-4">
+            <table className="w-full text-left">
+              <thead>
+                <tr>
+                  <th className="border-b pb-2">Field</th>
+                  <th className="border-b pb-2">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border-b py-2">Title</td>
+                  <td className="border-b py-2">{issueDetails.title}</td>
+                </tr>
+                <tr>
+                  <td className="border-b py-2">Description</td>
+                  <td className="border-b py-2">{issueDetails.description}</td>
+                </tr>
+                <tr>
+                  <td className="border-b py-2">Category</td>
+                  <td className="border-b py-2">{issueDetails.category}</td>
+                </tr>
+                <tr>
+                  <td className="border-b py-2">Status</td>
+                  <td className="border-b py-2">{issueDetails.status}</td>
+                </tr>
+                <tr>
+                  <td className="border-b py-2">Reason</td>
+                  <td className="border-b py-2">{issueDetails.reason}</td>
+                </tr>
+                {/* Add more fields as needed */}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <DialogFooter className="sm:justify-start">
+          <DialogClose asChild>
+            <Button onClick={e => {setIssueDetails(null); setIssueId('')}} type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+   
       </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+        <div className="form flex items-center justify-center p-10 border rounded-lg border-[#e3e3e3] dark:border-[#949494] w-[650px] h-full">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="insideForm w-full h-full flex items-center justify-center flex-col gap-4">
+            <div className="formItem w-full">
+              <FormField
+                control={form.control}
+                name="orgId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Organization ID</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Organization ID" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              </div>
+              <div className="formItem w-full">
+              <FormField
+                control={form.control}
+                name="issueId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Issue ID</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Issue ID" {...field} readOnly />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              </div>
+              <div className="formItem w-full">
+              <FormField
+                control={form.control}
+                name="issueTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Issue Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Issue Title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              </div>
+               <div className="formItem w-full">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Type your description here." className="h-12" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               </div>
+               <div className="formItem w-full">
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <FormControl>
+                  <Controller
+                    control={control}
+                    name="category"
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Category</SelectLabel>
+                            <SelectItem value="HR">HR</SelectItem>
+                            <SelectItem value="Management">Management</SelectItem>
+                            <SelectItem value="IT">IT</SelectItem>
+                            <SelectItem value="Sales">Sales</SelectItem>
+                            <SelectItem value="Marketing">Marketing</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+              <div className="formItem w-full">
+              <FormField
+                control={form.control}
+                name="file"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Attachments</FormLabel>
+                    <FormControl>
+                      <Input id="attachments" type="file" {...fileRef} multiple />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               </div>
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? 'Submitting...' : 'Submit'}
+              </Button>
+            </form>
+          </Form>
+        </div>
       </div>
     </main>
   );
