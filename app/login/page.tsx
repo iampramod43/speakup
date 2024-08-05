@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';  // Corrected import
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 
 function Page() {  // Renamed from 'page' to 'Page'
     const router = useRouter();
@@ -36,22 +37,26 @@ function Page() {  // Renamed from 'page' to 'Page'
                     body: JSON.stringify(data),
                 });
                 if (!response.ok) {
-                    throw new Error('Failed to submit form');
+                    throw new Error('Failed to Sign Up');
                 }
                 const result = await response.json();
                 console.log('Form submitted successfully', result);
+                toast.success('Sign up successful');
                 setIsSignUp(!isSignUp);
             } catch (error) {
                 console.error('Error submitting form', error);
+                toast.error('Error signing up');
             }
         } else {
             const res = await signIn('credentials', {...data, redirect: false});
             if (res?.error) {
                 console.error('Error signing in', res.error);
+                toast.error('Error signing in');
                 return;
             }
             router.push('/dashboard');
             console.log('Form submitted successfully', res);
+            toast.success('Sign in successful');
         }
     };
 

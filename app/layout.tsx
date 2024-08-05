@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
+
 
 import Header from "@/components/Header";
 import { AuthProvider } from "./Providers";
@@ -31,6 +33,7 @@ export default function RootLayout({
         <Header />
         {children}
         </AuthProvider>
+        <Toaster />
 
         {/* Toaster */}
         </ThemeProvider>

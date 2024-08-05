@@ -18,6 +18,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from 'sonner';
 
 function Header() {
   const { data: session } = useSession();
@@ -27,8 +28,10 @@ function Header() {
   const handleLogout = async () => {
     try {
       await signOut({ callbackUrl: '/' });
+      toast.success('Logged out');
     } catch (error) {
       console.error('Error logging out:', error);
+      toast.error('Error logging out');
     }
   };
 

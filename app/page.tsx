@@ -36,7 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useSession } from "next-auth/react";
-
+import { toast } from "sonner";
 // Define the schema with a custom refinement for file validation
 const formSchema = z.object({
   orgId: z.string().min(4, {
@@ -125,8 +125,14 @@ export default function Home() {
 
       const result = await response.json();
       console.log("Form submitted successfully", result);
+      toast.success('Issue submitted successfully');
+      // clear all the values
+      form.reset();
+      setIssueId("");
+      setIssueDetails(null);
     } catch (error) {
       console.error("Error submitting form", error);
+      toast.error('Error submitting issue');
     } finally {
       setLoading(false);
     }
