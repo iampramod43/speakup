@@ -20,6 +20,13 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
+// Define the type for each data point in the pie chart
+type ChartDataPoint = {
+  category: string;
+  count: number;
+  fill: string;
+};
+
 const chartConfig = {
   count: {
     label: "Count",
@@ -52,22 +59,25 @@ const chartConfig = {
     label: "other",
     color: "hsl(var(--chart-5))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export default function PieChartComponent() {
-  const [chartData, setChartData] = useState([]);
+  // Use the ChartDataPoint type for the chartData state
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchChartData = async () => {
       try {
-        const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/pie");
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/pie"
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch chart data");
         }
         const issues = await response.json();
         const data = issues.map((issue: any) => {
-          const category = issue.category || "unknown"; // Default to "unknown" if _id is undefined
+          const category = issue.category || "unknown"; // Default to "unknown" if category is undefined
           return {
             category,
             count: issue.count,

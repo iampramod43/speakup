@@ -18,7 +18,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
+// Define the type for each data point
+type ChartDataPoint = {
+  month: string;
+  count: number;
+};
 const chartConfig = {
   issues: {
     label: "Issues",
@@ -27,7 +31,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function LineChartComponent() {
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

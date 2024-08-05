@@ -3,67 +3,57 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';  // Corrected import
 import { signIn } from "next-auth/react";
 
-function page() {
-    const router = useRouter()
-  const [isSignUp, setIsSignUp] = useState(false);
-  // create three states orgName, orgId, password
-  const [orgName, setOrgName] = useState("");
-  const [orgId, setOrgId] = useState("");
-  const [password, setPassword] = useState("");
+function Page() {  // Renamed from 'page' to 'Page'
+    const router = useRouter();
+    const [isSignUp, setIsSignUp] = useState(false);
+    const [orgName, setOrgName] = useState("");
+    const [orgId, setOrgId] = useState("");
+    const [password, setPassword] = useState("");
 
-  
-
-  // create a fucntion to set the isSignUp
-  const toggleSignUp = () => {
-    setIsSignUp(!isSignUp);
-  };
-  const handleAuth = async () => {
-    
-    const data = {
-        orgId: orgId,
-        orgName: orgName,
-        password: password,
+    const toggleSignUp = () => {
+        setIsSignUp(!isSignUp);
     };
 
-    console.log("🚀 ~ file: page.tsx:31 ~ handleAuth ~ data:", data);
+    const handleAuth = async () => {
+        const data = {
+            orgId: orgId,
+            orgName: orgName,
+            password: password,
+        };
 
+        console.log("🚀 ~ file: Page.tsx:31 ~ handleAuth ~ data:", data);
 
-
-    if (isSignUp) {
-    //   hit signUp api
-      try {
-
-        
-        const response = await fetch('http://localhost:4001/org/create', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data), // Convert data to JSON string
-          });
-          if (!response.ok) {
-            throw new Error('Failed to submit form');
-          }
-          const result = await response.json();
-          console.log('Form submitted successfully', result);
-          setIsSignUp(!isSignUp);
-        } catch (error) {
-          console.error('Error submitting form', error);
-        }
-    } else {
+        if (isSignUp) {
+            try {
+                const response = await fetch('http://localhost:4001/org/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to submit form');
+                }
+                const result = await response.json();
+                console.log('Form submitted successfully', result);
+                setIsSignUp(!isSignUp);
+            } catch (error) {
+                console.error('Error submitting form', error);
+            }
+        } else {
             const res = await signIn('credentials', {...data, redirect: false});
             if (res?.error) {
-              console.error('Error signing in', res.error);
-              return;
+                console.error('Error signing in', res.error);
+                return;
             }
             router.push('/dashboard');
             console.log('Form submitted successfully', res);
-            
-    }
-  };
+        }
+    };
 
   return (
     <div className="main flex h-screen w-screen rounded-[16px]">
@@ -139,4 +129,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

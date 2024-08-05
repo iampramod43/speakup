@@ -20,7 +20,18 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const initialChartData = [
+// Define the type for each chart data point
+type ChartData = {
+  month: string;
+  Finance: number;
+  HR: number;
+  IT: number;
+  Marketing: number;
+  Operations: number;
+};
+
+// Define the initial chart data
+const initialChartData: ChartData[] = [
   { month: "February", Finance: 1, HR: 1, IT: 1, Marketing: 1, Operations: 1 },
   { month: "March", Finance: 1, HR: 1, IT: 1, Marketing: 1, Operations: 1 },
   { month: "April", Finance: 1, HR: 1, IT: 1, Marketing: 1, Operations: 1 },
@@ -30,7 +41,7 @@ const initialChartData = [
   { month: "August", Finance: 0, HR: 1, IT: 0, Marketing: 0, Operations: 0 },
 ];
 
-const chartConfig = {
+const chartConfig: ChartConfig = {
   Finance: {
     label: "Finance",
     color: "hsl(var(--chart-1))",
@@ -51,10 +62,10 @@ const chartConfig = {
     label: "Operations",
     color: "hsl(var(--chart-5))",
   },
-} satisfies ChartConfig;
+};
 
 export default function AreaChartComponent() {
-  const [chartData, setChartData] = useState(initialChartData);
+  const [chartData, setChartData] = useState<ChartData[]>(initialChartData);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -63,7 +74,7 @@ export default function AreaChartComponent() {
         const response = await axios.get(
           process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/area"
         );
-        const formattedData = response.data.map((item: any) => {
+        const formattedData: ChartData[] = response.data.map((item: any) => {
           return {
             month: item.month,
             ...item,
@@ -86,13 +97,13 @@ export default function AreaChartComponent() {
     const lastMonth = chartData[chartData.length - 1];
     const previousMonth = chartData[chartData.length - 2];
 
-    // Calculate the total for each month
-    const lastMonthTotal = Object.keys(chartConfig).reduce(
-      (sum, key) => sum + lastMonth[key],
+    // Calculate the total for each month using type-safe keys
+    const lastMonthTotal = (Object.keys(chartConfig) as Array<keyof ChartData>).reduce(
+      (sum, key) => sum + Number(lastMonth[key]),
       0
     );
-    const previousMonthTotal = Object.keys(chartConfig).reduce(
-      (sum, key) => sum + previousMonth[key],
+    const previousMonthTotal = (Object.keys(chartConfig) as Array<keyof ChartData>).reduce(
+      (sum, key) => sum + Number(previousMonth[key]),
       0
     );
 
@@ -140,7 +151,7 @@ export default function AreaChartComponent() {
               cursor={false}
               content={<ChartTooltipContent indicator="dot" />}
             />
-            {Object.keys(chartConfig).map((key) => (
+            {(Object.keys(chartConfig) as Array<keyof ChartData>).map((key) => (
               <Area
                 key={key}
                 dataKey={key}

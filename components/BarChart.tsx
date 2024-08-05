@@ -19,6 +19,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
+// Define the type for each data point
+type ChartDataPoint = {
+  month: string;
+  count: number;
+};
+
 const chartConfig = {
   count: {
     label: "Count",
@@ -27,7 +33,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function BarChartComponent() {
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +45,7 @@ export default function BarChartComponent() {
         if (!response.ok) {
           throw new Error("Failed to fetch chart data");
         }
-        const data = await response.json();
+        const data: ChartDataPoint[] = await response.json();
         setChartData(data);
       } catch (error) {
         console.error("Error fetching chart data:", error);

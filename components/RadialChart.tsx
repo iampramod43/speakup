@@ -31,26 +31,37 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function RadialChartComponent() {
-  const [chartData, setChartData] = useState([{ browser: "safari", visitors: 0, fill: "var(--color-safari)" }]);
+  const [chartData, setChartData] = useState([
+    { browser: "safari", visitors: 0, fill: "var(--color-safari)" },
+  ]);
   const [loading, setLoading] = useState(true);
   const [trend, setTrend] = useState({ isUp: true, percentage: 0 });
 
   useEffect(() => {
     const fetchChartData = async () => {
       try {
-        const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/radial");
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/radial"
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch chart data");
         }
         const data = await response.json();
         // Assume response is like { count: 31 }
         const currentVisitors = data.count;
-        setChartData([{ browser: "safari", visitors: currentVisitors, fill: "var(--color-safari)" }]);
+        setChartData([
+          { browser: "safari", visitors: currentVisitors, fill: "var(--color-safari)" },
+        ]);
 
         // Example trend calculation based on hypothetical previous month's data
         const previousMonthVisitors = 25; // This is a placeholder for example purposes
-        const trendPercentage = ((currentVisitors - previousMonthVisitors) / previousMonthVisitors) * 100;
-        setTrend({ isUp: trendPercentage > 0, percentage: Math.abs(trendPercentage).toFixed(1) });
+        const trendPercentage =
+          ((currentVisitors - previousMonthVisitors) / previousMonthVisitors) *
+          100;
+        setTrend({
+          isUp: trendPercentage > 0,
+          percentage: parseFloat(Math.abs(trendPercentage).toFixed(1)), // Convert string to number
+        });
       } catch (error) {
         console.error("Error fetching chart data:", error);
       } finally {
@@ -129,11 +140,13 @@ export default function RadialChartComponent() {
         <div className="flex items-center gap-2 font-medium leading-none">
           {trend.isUp ? (
             <span className="text-green-600">
-              Trending up by {trend.percentage}% this month <TrendingUp className="h-4 w-4 inline" />
+              Trending up by {trend.percentage}% this month{" "}
+              <TrendingUp className="h-4 w-4 inline" />
             </span>
           ) : (
             <span className="text-red-600">
-              Trending down by {trend.percentage}% this month <TrendingDown className="h-4 w-4 inline" />
+              Trending down by {trend.percentage}% this month{" "}
+              <TrendingDown className="h-4 w-4 inline" />
             </span>
           )}
         </div>
