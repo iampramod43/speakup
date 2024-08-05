@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 
 function Header() {
   const { data: session } = useSession();
-  const { theme, setTheme } = useTheme(); // Correctly destructuring theme and setTheme
+  const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
   const handleLogout = async () => {
@@ -43,13 +43,13 @@ function Header() {
     pathname === path ? 'text-[#000000] dark:text-[#ffffff]' : 'text-[#09090b99] dark:text-[#d0d0d0]';
 
   return (
-    <div className="header sticky flex items-center w-full h-[56px] shadow-sm dark:shadow-[#bbbbbb] dark:shadow-sm justify-between px-[40px] bg-white dark:bg-black transition-colors">
-      <div className="headerLeft h-full flex items-center">
-        <div className="w-[100px] h-[56px] text-[24px] font-bold items-center justify-center flex text-black dark:text-white">
+    <div className="header sticky top-0 flex items-center w-full h-[56px] shadow-sm dark:shadow-[#bbbbbb] dark:shadow-sm justify-between px-4 md:px-[40px] bg-white dark:bg-black transition-colors">
+      <div className="headerLeft flex items-center">
+        <div className="text-[20px] md:text-[24px] font-bold flex text-black dark:text-white">
           SpeakUp
         </div>
       </div>
-      <div className="headerNav flex items-center gap-8">
+      <div className="headerNav hidden md:flex items-center gap-8">
         <div className={`navItem cursor-pointer hover:text-[#000000]  dark:hover:text-[#ffffff] ${isActive('/')}`}>
           <Link href="/">Home</Link>
         </div>
@@ -64,8 +64,32 @@ function Header() {
           </>
         )}
       </div>
-      <div className="headerRight h-full flex items-center">
-        <div className="headerRightLabel h-full flex items-center justify-end gap-2">
+      <div className="flex md:hidden">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              ☰
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48">
+            <DropdownMenuItem>
+              <Link href="/">Home</Link>
+            </DropdownMenuItem>
+            {session?.user && (
+              <>
+                <DropdownMenuItem>
+                  <Link href="/dashboard">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/issues">Issues</Link>
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="headerRight flex items-center">
+        <div className="headerRightLabel flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Avatar>

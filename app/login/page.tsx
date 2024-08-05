@@ -60,78 +60,78 @@ function Page() {  // Renamed from 'page' to 'Page'
         }
     };
 
-  return (
-    <div className="main flex h-screen w-screen rounded-[16px]">
-      <div className="section p-[40px] flex w-screen">
-        <div className="left p-[40px] bg-[#18181b] dark:bg-[#fafafa] dark:text-[#18181b] text-[#efefef] flex-[0.5] h-full flex flex-col justify-between rounded-l-lg">
-          <div className="leftTop flex ">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              className="mr-2 h-6 w-6"
-            >
-              <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path>
-            </svg>
-            <h2>SpeakUp Inc</h2>
-          </div>
-          <div className="leftBottom">
-            <p>
-              We are a team of experts and dedicated to helping organizations
-              solve their problems.
-            </p>
-          </div>
+    return (
+        <div className="main flex flex-col md:flex-row h-screen w-screen rounded-[16px]">
+            <div className="section flex flex-col md:flex-row p-4 md:p-[40px] w-full md:w-screen">
+                <div className="left p-4 md:p-[40px] bg-[#18181b] dark:bg-[#fafafa] dark:text-[#18181b] text-[#efefef] flex-[0.5] h-full flex flex-col justify-between rounded-t-lg md:rounded-l-lg md:rounded-tr-none">
+                    <div className="leftTop flex items-center">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="mr-2 h-6 w-6"
+                        >
+                            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path>
+                        </svg>
+                        <h2>SpeakUp Inc</h2>
+                    </div>
+                    <div className="leftBottom mt-4">
+                        <p>
+                            We are a team of experts dedicated to helping organizations
+                            solve their problems.
+                        </p>
+                    </div>
+                </div>
+                <div className="right relative p-4 md:p-[40px] w-full border-slate-50 border-2 flex-[0.5] h-full rounded-b-lg md:rounded-r-lg md:rounded-bl-none flex flex-col items-center justify-center">
+                    <div>
+                        <div
+                            className="top absolute top-4 right-4 md:top-10 md:right-10 dark:text-[#efefef] text-[#09090b99] hover:text-[#000000] cursor-pointer"
+                            onClick={toggleSignUp}
+                        >
+                            {isSignUp ? "Login" : "Sign Up"}
+                        </div>
+                    </div>
+                    <div className="center flex flex-col items-center justify-center gap-4">
+                        <div className="label text-[20px] md:text-[24px] font-bold">
+                            {isSignUp ? "Create an account" : "Sign in to your organization"}
+                        </div>
+                        <div className="item w-full md:w-[352px] h-[36px] mt-[4px]">
+                            <Input
+                                type="text"
+                                placeholder="Organization ID"
+                                onChange={(e) => setOrgId(e.target.value)}
+                            />
+                        </div>
+                        {isSignUp && (
+                            <div className="item w-full md:w-[352px] h-[36px] mt-[4px]">
+                                <Input
+                                    type="text"
+                                    placeholder="Organization Name"
+                                    onChange={(e) => setOrgName(e.target.value)}
+                                />
+                            </div>
+                        )}
+                        <div className="item w-full md:w-[352px] h-[36px]">
+                            <Input
+                                type="password"
+                                placeholder="Password"
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
+                        <div className="item w-full md:w-[352px] h-[36px] mt-[8px]">
+                            <Button onClick={handleAuth} className="w-full">
+                                {isSignUp ? "Sign Up" : "Login"}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div className="right relative p-[40px] w-full border-slate-50	border-2  flex-[0.5] h-full rounded-r-lg flex flex-col items-center justify-center">
-          <div>
-            <div
-              className="top absolute top-10 right-10 dark:text-[#efefef] text-[#09090b99] hover:text-[#000000]"
-              onClick={toggleSignUp}
-            >
-              {isSignUp ? "Login" : "Sign Up"}
-            </div>
-          </div>
-          <div className="center flex flex-col items-center justify-center gap-4">
-            <div className="label text-[24px] font-bold	">
-              {isSignUp ? "Create an account" : "Sign in to your organization"}
-            </div>
-            <div className="item w-[352px]	h-[36px] mt-[4px]">
-              <Input
-                type="text"
-                placeholder="Organization ID"
-                onChange={(e) => setOrgId(e.target.value)}
-              />
-            </div>
-            {isSignUp && (
-              <div className="item w-[352px]	h-[36px] mt-[4px]">
-                <Input
-                  type="text"
-                  placeholder="Organization Name"
-                  onChange={(e) => setOrgName(e.target.value)}
-                />
-              </div>
-            )}
-            <div className="item w-[352px]	h-[36px]">
-              <Input
-                type="password"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="item w-[352px]	h-[36px] mt-[8px]">
-              <Button onClick={handleAuth} className="w-full">
-                {isSignUp ? "Sign Up" : "Login"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default Page;

@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+
 // Define the schema with a custom refinement for file validation
 const formSchema = z.object({
   orgId: z.string().min(4, {
@@ -162,12 +163,12 @@ export default function Home() {
 
   const { control, handleSubmit, register, watch } = form;
   return (
-    <main className="p-[40px]">
-      <div className="mainTitle h-[100px] flex items-center justify-center text-[40px] font-bold text-[#242424] dark:text-[#fafafa]">
+    <main className="p-4 md:p-10">
+      <div className="mainTitle h-[100px] flex items-center justify-center text-[32px] md:text-[40px] font-bold text-[#242424] dark:text-[#fafafa]">
         What is your Issue?
       </div>
-      <div className="mainBody flex w-full h-full flex-col items-center justify-center p-10 gap-[12px]">
-        <div className="issueExists w-[650px] flex justify-end">
+      <div className="mainBody flex w-full h-full flex-col items-center justify-center p-4 md:p-10 gap-4 md:gap-[12px]">
+        <div className="issueExists w-full md:w-[650px] flex justify-end">
           <Dialog>
             <DialogTrigger asChild>
               <p className="text-[#0a8537] cursor-pointer">
@@ -254,7 +255,7 @@ export default function Home() {
             </DialogContent>
           </Dialog>
         </div>
-        <div className="form flex items-center justify-center p-10 border rounded-lg border-[#e3e3e3] dark:border-[#949494] w-[650px] h-full">
+        <div className="form flex items-center justify-center p-4 md:p-10 border rounded-lg border-[#e3e3e3] dark:border-[#949494] w-full md:w-[650px] h-full">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -315,7 +316,7 @@ export default function Home() {
                       <FormControl>
                         <Textarea
                           placeholder="Type your description here."
-                          className="h-12"
+                          className="h-24"
                           {...field}
                         />
                       </FormControl>
