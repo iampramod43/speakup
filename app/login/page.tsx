@@ -28,7 +28,7 @@ function Page() {  // Renamed from 'page' to 'Page'
 
         if (isSignUp) {
             try {
-                const response = await fetch('http://localhost:4001/org/create', {
+                const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + 'org/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

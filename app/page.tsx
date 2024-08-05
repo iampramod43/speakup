@@ -114,7 +114,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:4001/issues/create", {
+      const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "issues/create", {
         method: "POST",
         body: formData,
       });
