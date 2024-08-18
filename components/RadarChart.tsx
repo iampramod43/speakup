@@ -18,6 +18,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useSession } from 'next-auth/react';
 
 const initialChartData = [
   { month: "January", count: 186 },
@@ -36,13 +37,17 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function RadarChartComponent() {
+  const { data: session } = useSession();
+
   const [chartData, setChartData] = useState(initialChartData);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchChartData = async () => {
       try {
-        const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/radar");
+        const orgId = session?.user?.oid;
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}dashboard/chart/radar?orgId=${orgId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch chart data");
         }

@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
+import { useSession } from 'next-auth/react';
 
 const chartConfig = {
   visitors: {
@@ -31,6 +32,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function RadialChartComponent() {
+  const { data: session } = useSession();
+
   const [chartData, setChartData] = useState([
     { browser: "safari", visitors: 0, fill: "var(--color-safari)" },
   ]);
@@ -40,8 +43,10 @@ export default function RadialChartComponent() {
   useEffect(() => {
     const fetchChartData = async () => {
       try {
+        const orgId = session?.user?.oid;
+
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/radial"
+          `${process.env.NEXT_PUBLIC_BASE_URL}dashboard/chart/radial?orgId=${orgId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch chart data");

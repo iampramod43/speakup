@@ -18,6 +18,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useSession } from 'next-auth/react';
+
 // Define the type for each data point
 type ChartDataPoint = {
   month: string;
@@ -31,25 +33,28 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function LineChartComponent() {
+  const { data: session } = useSession();
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchChartData = async () => {
-      try {
-        const response = await axios.get(
-          process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/line"
-        );
-        setChartData(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching chart data:", error);
-        setLoading(false);
-      }
-    };
+  const fetchChartData = async () => {
+    try {
+      const orgId = session?.user?.oid;  // Replace with actual orgId or fetch dynamically if needed
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}dashboard/chart/line?orgId=${orgId}`
+      );
+      setChartData(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+      setLoading(false);
+    }
+  };
 
-    fetchChartData();
-  }, []);
+  fetchChartData();
+}, []);
+
 
   // Calculate the trend using the last two months' data
   const trend = useMemo(() => {

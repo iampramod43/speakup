@@ -19,6 +19,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useSession } from 'next-auth/react';
 
 // Define the type for each data point in the pie chart
 type ChartDataPoint = {
@@ -62,6 +63,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function PieChartComponent() {
+  const { data: session } = useSession();
+
   // Use the ChartDataPoint type for the chartData state
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,8 +72,10 @@ export default function PieChartComponent() {
   useEffect(() => {
     const fetchChartData = async () => {
       try {
+        const orgId = session?.user?.oid;
+
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/pie"
+          `${process.env.NEXT_PUBLIC_BASE_URL}dashboard/chart/pie?orgId=${orgId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch chart data");

@@ -18,6 +18,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useSession } from 'next-auth/react';
+
 
 // Define the type for each data point
 type ChartDataPoint = {
@@ -33,14 +35,17 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function BarChartComponent() {
+  const { data: session } = useSession();
+
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchChartData = async () => {
       try {
+        const orgId = session?.user?.oid;
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/bar"
+          `${process.env.NEXT_PUBLIC_BASE_URL}dashboard/chart/bar?orgId=${orgId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch chart data");

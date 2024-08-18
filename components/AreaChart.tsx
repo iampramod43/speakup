@@ -19,6 +19,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useSession } from "next-auth/react";
 
 // Define the type for each chart data point
 type ChartData = {
@@ -65,14 +66,17 @@ const chartConfig: ChartConfig = {
 };
 
 export default function AreaChartComponent() {
+  const { data: session } = useSession();
+
   const [chartData, setChartData] = useState<ChartData[]>(initialChartData);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchChartData = async () => {
       try {
+        const orgId = session?.user?.oid;
         const response = await axios.get(
-          process.env.NEXT_PUBLIC_BASE_URL + "dashboard/chart/area"
+          `${process.env.NEXT_PUBLIC_BASE_URL}dashboard/chart/area?orgId=${orgId}`
         );
         const formattedData: ChartData[] = response.data.map((item: any) => {
           return {
