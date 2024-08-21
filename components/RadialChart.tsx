@@ -85,7 +85,7 @@ export default function RadialChartComponent() {
     <Card className="chart shadow-none border-none ">
       <CardHeader className="items-center pb-0">
         <CardTitle>Radial Chart - Shape</CardTitle>
-        <CardDescription>Showing total issues</CardDescription>
+        <CardDescription>Showing total issues resolved</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer

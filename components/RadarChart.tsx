@@ -86,7 +86,7 @@ export default function RadarChartComponent() {
       <CardHeader>
         <CardTitle>Radar Chart</CardTitle>
         <CardDescription>
-          Showing total issues for the last 6 months
+          Showing total issues resolved for the last 6 months
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-0">
